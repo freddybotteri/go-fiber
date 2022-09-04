@@ -3,17 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
-
 	"os"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"github.com/freddybotteri/go-fiber/models"
-	
+	. "github.com/freddybotteri/go-fiber/models"
 )
 
 func main() {
@@ -29,8 +25,9 @@ func main() {
 		mongodb = "mongodb://localhost:27017/gomongodb"
 	}
 
+
 	app := fiber.New()
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb+srv://fazt:faztpassword@cluster0.ynu6g.mongodb.net/?retryWrites=true&w=majority"))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://mongo:27017"))
 
 	if err != nil {
 		panic(err)
@@ -41,7 +38,7 @@ func main() {
 	app.Static("/", "./client/dist")
 
 	app.Post("/users", func(c *fiber.Ctx) error {
-		var user models.User
+		var user User
 
 		c.BodyParser(&user)
 
@@ -61,7 +58,7 @@ func main() {
 	})
 
 	app.Get("/users", func(c *fiber.Ctx) error {
-		var users []models.User
+		var users []User
 
 		coll := client.Database("gomongodb").Collection("users")
 		results, error := coll.Find(context.TODO(), bson.M{})
@@ -71,7 +68,7 @@ func main() {
 		}
 
 		for results.Next(context.TODO()) {
-			var user models.User
+			var user User
 			results.Decode(&user)
 			users = append(users, user)
 		}

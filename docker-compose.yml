@@ -1,0 +1,29 @@
+version: '3'
+services:
+  go:
+    build:
+      dockerfile: Dockerfile
+      context: "./"
+    container_name: containerGoFiber
+    depends_on: 
+      - mongo
+    command: go run main.go
+    networks:
+      - go_backend
+    ports:
+       - '3000:3000'
+    restart: always
+
+  mongo:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - 27017:27017
+    networks:
+      - go_backend
+    command: mongod --bind_ip mongodb
+
+networks: 
+  go_backend:
+    driver: bridge
